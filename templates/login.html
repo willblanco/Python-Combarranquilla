@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <section style="max-width:400px; margin:auto;">
+    <h2>Iniciar Sesión</h2>
+    <form method="post">
+      <label>
+        Usuario
+        <input name="usuario" type="text" placeholder="Usuario">
+      </label>
+      <label>
+        Contraseña
+        <input name="clave" type="password" placeholder="Contraseña">
+      </label>
+      <button type="submit">Ingresar</button>
+    </form>
+  </section>
+{% endblock %}
