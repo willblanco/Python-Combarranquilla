@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; max-width:800px; margin:auto; margin-top:1rem;">
+  <h2>¡Bienvenido, {{ session.user }}!</h2>
+  <a href="{{ url_for('logout') }}" style="text-decoration: none; padding: 0.5rem 1rem; background: #c62828; color: white; border-radius: 5px;">
+    Cerrar sesión
+  </a>
+</div>
+  <section style="max-width:800px; margin:auto;">
+
+    <!-- Agregar / Editar -->
+    <div class="card" style="padding:1rem; margin-bottom:1rem;">
+      {% if edit_tarea %}
+        <h3>Editar Tarea</h3>
+        <form method="post" action="{{ url_for('editar', id=edit_id) }}">
+      {% else %}
+        <h3>Agregar Nueva Tarea</h3>
+        <form method="post" action="{{ url_for('tareas') }}">
+      {% endif %}
+          <label>
+            Título
+            <input name="titulo" type="text" placeholder="Título"
+              {% if edit_tarea %} value="{{ edit_tarea[0] }}"{% endif %} required>
+          </label>
+          <label>
+            Descripción
+            <textarea name="descripcion" rows="2" placeholder="Descripción" required>{% if edit_tarea %}{{ edit_tarea[1] }}{% endif %}</textarea>
+          </label>
+          <div style="display:flex; gap:1rem;">
+            <label style="flex:1;">
+              Fecha
+              <input name="fecha" type="date" required
+                 min="{{ min_date }}" max="{{ max_date }}"
+                 {% if edit_tarea %} value="{{ edit_tarea[2] }}"{% endif %}>
+            </label>
+            <label style="flex:1;">
+              Estado
+              <select name="estado">
+                <option {% if edit_tarea and edit_tarea[3]=="Pendiente" %}selected{% endif %}>Pendiente</option>
+                <option {% if edit_tarea and edit_tarea[3]=="Completada" %}selected{% endif %}>Completada</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit">
+            {% if edit_tarea %}Actualizar{% else %}Agregar{% endif %}
+          </button>
+        </form>
+    </div>
+
+    <!-- Filtro -->
+    <form method="get" style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem;">
+      <label>
+        Filtrar por estado
+        <select name="filtro">
+          <option {% if filtro=="Todos" %}selected{% endif %}>Todos</option>
+          <option {% if filtro=="Pendiente" %}selected{% endif %}>Pendiente</option>
+          <option {% if filtro=="Completada" %}selected{% endif %}>Completada</option>
+        </select>
+      </label>
+      <button type="submit" style="margin-top: 1.8rem;">Aplicar</button>
+    </form>
+
+    <!-- Tabla de tareas -->
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th><th>Descripción</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tareas %}
+        <tr>
+          <td>{{ t[1] }}</td>
+          <td>{{ t[2] }}</td>
+          <td>{{ t[3] }}</td>
+          <td>{{ t[4] }}</td>
+          <td>
+            <div class="actions">
+              <form action="{{ url_for('borrar', id=t[0]) }}" method="get"onsubmit="return confirm('¿Estás seguro de eliminar esta tarea?');">
+                <button class="btn-danger">Eliminar</button>
+              </form>
+              <form action="{{ url_for('editar_form', id=t[0]) }}" method="get">
+                <button class="btn-warning">Editar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form action="{{ url_for('exportar') }}" method="get" style="margin-top: 1rem;">
+      <button type="submit">Exportar tareas</button>
+    </form>
+  </section>
+{% endblock %}
